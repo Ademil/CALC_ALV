@@ -1,0 +1,2101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Profissional - Custo de Alvenaria e Revestimentos</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a3a5f, #2c5282);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .nbr-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .content {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+        
+        .input-section, .results-section {
+            padding: 30px;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .input-section {
+            border-right: 1px solid #eee;
+            background-color: #f9fafc;
+        }
+        
+        .results-section {
+            background-color: white;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            color: #1a3a5f;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #2c5282;
+            display: flex;
+            align-items: center;
+        }
+        
+        .section-title i {
+            margin-right: 10px;
+            color: #2c5282;
+        }
+        
+        .info-card {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #2c5282;
+        }
+        
+        .info-card h3 {
+            margin-bottom: 10px;
+            color: #1a3a5f;
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-card h3 i {
+            margin-right: 8px;
+        }
+        
+        .info-card p {
+            margin-bottom: 5px;
+        }
+        
+        .dimensions-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .dimension-box {
+            background-color: #d4e7f7;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .dimension-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1a3a5f;
+        }
+        
+        .dimension-label {
+            font-size: 13px;
+            color: #555;
+            margin-top: 5px;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        .input-with-unit {
+            position: relative;
+        }
+        
+        select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        select:focus, input:focus {
+            outline: none;
+            border-color: #2c5282;
+            box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.2);
+        }
+        
+        .unit {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        .dimensions-input {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+        
+        .traco-input {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .traco-part {
+            background-color: #f0f8ff;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .traco-label {
+            font-size: 12px;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        
+        .traco-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a3a5f;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        .checkbox-group input {
+            width: auto;
+            margin-right: 10px;
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #2c5282, #1a3a5f);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .calculate-btn:hover {
+            background: linear-gradient(135deg, #234874, #15304d);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .export-btn {
+            background: linear-gradient(135deg, #28a745, #1e7e34);
+            color: white;
+            border: none;
+            padding: 16px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .export-btn:hover {
+            background: linear-gradient(135deg, #218838, #155724);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .export-btn:active {
+            transform: translateY(0);
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .results-container {
+            margin-top: 20px;
+        }
+        
+        .result-card {
+            background-color: #f9fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2c5282;
+        }
+        
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a3a5f;
+            margin-bottom: 10px;
+        }
+        
+        .result-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a3a5f;
+        }
+        
+        .result-details {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .breakdown {
+            margin-top: 30px;
+        }
+        
+        .breakdown-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1a3a5f;
+            margin-bottom: 15px;
+        }
+        
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .breakdown-item:last-child {
+            border-bottom: none;
+            font-weight: 600;
+            color: #1a3a5f;
+        }
+        
+        .technical-info {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #555;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .technical-info h4 {
+            color: #1a3a5f;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .note {
+            font-size: 14px;
+            color: #777;
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .warning {
+            background-color: #fff8e1;
+            border-left: 4px solid #ffb300;
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #5d4037;
+        }
+        
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .material-card {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #4a90e2;
+        }
+        
+        .material-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a3a5f;
+            margin-bottom: 8px;
+        }
+        
+        .material-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #2c5282;
+        }
+        
+        @media (max-width: 768px) {
+            .input-section, .results-section {
+                flex: 100%;
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .dimensions-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .dimensions-input {
+                grid-template-columns: 1fr;
+            }
+            
+            .traco-input {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .materials-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nbr-badge {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-top: 10px;
+                display: inline-block;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            background-color: #f1f5f9;
+            border: none;
+            border-radius: 6px 6px 0 0;
+            margin-right: 5px;
+            font-weight: 600;
+            color: #555;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            background-color: #2c5282;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .material-icon {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #2c5282;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .traco-display {
+            background-color: #e8f4fc;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+            color: #1a3a5f;
+        }
+        
+        .normas-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .norma-card {
+            background-color: #f0f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #d4e7f7;
+        }
+        
+        .norma-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #1a3a5f;
+            margin-bottom: 8px;
+        }
+        
+        .norma-description {
+            font-size: 14px;
+            color: #555;
+        }
+        
+        .revestimento-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .revestimento-option {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .revestimento-option.active {
+            background-color: #e8f4fc;
+            border-color: #2c5282;
+        }
+        
+        .revestimento-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #2c5282;
+        }
+        
+        .revestimento-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a3a5f;
+        }
+        
+        .revestimento-thickness {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Gerando PDF...</p>
+    </div>
+    
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-calculator"></i> Calculadora Profissional de Custo de Alvenaria</h1>
+            <p>Cálculo completo com normas ABNT NBR para revestimentos</p>
+            <div class="nbr-badge">NBR 7200:2015</div>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <div class="tabs">
+                    <button class="tab active" data-tab="wall">Parede</button>
+                    <button class="tab" data-tab="brick">Tijolo</button>
+                    <button class="tab" data-tab="traco">Traço Argamassa</button>
+                    <button class="tab" data-tab="norms">Normas ABNT</button>
+                    <button class="tab" data-tab="prices">Preços</button>
+                </div>
+                
+                <div id="wall-tab" class="tab-content active">
+                    <div class="section-title">
+                        <i class="fas fa-ruler-combined"></i> Dimensões da Parede
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> Informações da Parede</h3>
+                        <div class="dimensions-container">
+                            <div class="dimension-box">
+                                <div class="dimension-value" id="display-length">6.0 m</div>
+                                <div class="dimension-label">Comprimento</div>
+                            </div>
+                            <div class="dimension-box">
+                                <div class="dimension-value" id="display-height">3.0 m</div>
+                                <div class="dimension-label">Altura</div>
+                            </div>
+                            <div class="dimension-box">
+                                <div class="dimension-value" id="display-area">18.0 m²</div>
+                                <div class="dimension-label">Área Total</div>
+                            </div>
+                            <div class="dimension-box">
+                                <div class="dimension-value" id="display-volume">0.00 m³</div>
+                                <div class="dimension-label">Volume de Argamassa</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="wall-length"><i class="fas fa-arrows-alt-h"></i> Comprimento da parede</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="wall-length" min="0.1" step="0.1" value="6.0">
+                            <div class="unit">m</div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="wall-height"><i class="fas fa-arrows-alt-v"></i> Altura da parede</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="wall-height" min="0.1" step="0.1" value="3.0">
+                            <div class="unit">m</div>
+                        </div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="two-sides" checked>
+                        <label for="two-sides">Revestimento nas duas faces da parede</label>
+                    </div>
+                    
+                    <div class="technical-info">
+                        <h4><i class="fas fa-clipboard-check"></i> Considerações técnicas</h4>
+                        <p>• Desconsiderados vãos de portas e janelas para cálculo</p>
+                        <p>• Margem de segurança de 10% incluída nas quantidades</p>
+                        <p>• Junta de assentamento padrão: 1.5 cm (NBR 15270-1:2017)</p>
+                    </div>
+                </div>
+                
+                <div id="brick-tab" class="tab-content">
+                    <div class="section-title">
+                        <i class="fas fa-cube"></i> Especificações do Tijolo
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="brick-type"><i class="fas fa-list"></i> Tipo de Tijolo</label>
+                        <select id="brick-type">
+                            <option value="9holes">Tijolo de 9 Furos (14x19x29cm)</option>
+                            <option value="8holes">Tijolo de 8 Furos (11.5x14x24cm)</option>
+                            <option value="6holes">Tijolo de 6 Furos (9x14x19cm)</option>
+                            <option value="baiano">Tijolo Baiano (9x19x19cm)</option>
+                            <option value="custom">Personalizado (insira dimensões)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-ruler"></i> Dimensões do Tijolo (cm)</h3>
+                        <p>Insira as dimensões em centímetros:</p>
+                        <div class="dimensions-input">
+                            <div class="input-group">
+                                <label>Espessura (largura)</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="brick-width" min="1" step="0.1" value="14.0">
+                                    <div class="unit">cm</div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Altura</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="brick-height" min="1" step="0.1" value="19.0">
+                                    <div class="unit">cm</div>
+                                </div>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label>Comprimento</label>
+                                <div class="input-with-unit">
+                                    <input type="number" id="brick-length" min="1" step="0.1" value="29.0">
+                                    <div class="unit">cm</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="joint-thickness"><i class="fas fa-expand-alt"></i> Espessura da junta de assentamento</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="joint-thickness" min="0.5" step="0.1" value="1.5">
+                            <div class="unit">cm</div>
+                        </div>
+                        <div class="result-details">Conforme NBR 15270-1:2017 (1.0 a 1.5 cm)</div>
+                    </div>
+                    
+                    <div class="warning">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Atenção:</strong> Dimensões do tijolo devem ser medidas sem considerar as juntas. A espessura da junta será adicionada automaticamente no cálculo.
+                    </div>
+                </div>
+                
+                <div id="traco-tab" class="tab-content">
+                    <div class="section-title">
+                        <i class="fas fa-balance-scale"></i> Traço de Argamassa e Revestimentos
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> Camadas de Revestimento (NBR 7200:2015)</h3>
+                        <div class="revestimento-options">
+                            <div class="revestimento-option active" id="option-chapisco" data-type="chapisco">
+                                <div class="revestimento-icon">🧱</div>
+                                <div class="revestimento-label">Chapisco</div>
+                                <div class="revestimento-thickness">3-5 mm</div>
+                            </div>
+                            <div class="revestimento-option active" id="option-emboco" data-type="emboco">
+                                <div class="revestimento-icon">🏗️</div>
+                                <div class="revestimento-label">Emboço</div>
+                                <div class="revestimento-thickness">15-20 mm</div>
+                            </div>
+                            <div class="revestimento-option active" id="option-reboco" data-type="reboco">
+                                <div class="revestimento-icon">🧴</div>
+                                <div class="revestimento-label">Reboco</div>
+                                <div class="revestimento-thickness">5-10 mm</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="mortar-traco-type"><i class="fas fa-mortar-pestle"></i> Tipo de Argamassa para Assentamento</label>
+                        <select id="mortar-traco-type">
+                            <option value="common">Tijolo Comum/Alicerce (1:2:8)</option>
+                            <option value="laminated">Laminado 1 tijolo (1:1:6)</option>
+                            <option value="perforated" selected>Tijolo Furado (1:2:8)</option>
+                            <option value="concrete19">Bloco Concreto 19cm (1:0,5:8)</option>
+                            <option value="concrete6">Bloco Concreto 6,5cm (1:0,5:6)</option>
+                            <option value="glass">Blocos de Vidro (1:0,5:5)</option>
+                            <option value="stone">Pedras Irregulares (1:0:4)</option>
+                            <option value="custom_mortar">Personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-ruler-combined"></i> Traço de Assentamento (Cimento : Cal : Areia)</h3>
+                        <div class="traco-input">
+                            <div class="traco-part">
+                                <div class="traco-label">Cimento</div>
+                                <div class="traco-value" id="mortar-cement-part">1</div>
+                            </div>
+                            <div class="traco-part">
+                                <div class="traco-label">Cal</div>
+                                <div class="traco-value" id="mortar-lime-part">2</div>
+                            </div>
+                            <div class="traco-part">
+                                <div class="traco-label">Areia</div>
+                                <div class="traco-value" id="mortar-sand-part">8</div>
+                            </div>
+                            <div class="traco-part">
+                                <div class="traco-label">Total Partes</div>
+                                <div class="traco-value" id="mortar-total-parts">11</div>
+                            </div>
+                        </div>
+                        <div class="traco-display" id="mortar-traco-display">Traço: 1 : 2 : 8</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="plaster-traco-type"><i class="fas fa-trowel"></i> Tipo de Argamassa para Revestimento</label>
+                        <select id="plaster-traco-type">
+                            <option value="chapisco_concreto">Chapisco Sobre Concreto (1:0:3)</option>
+                            <option value="chapisco_alvenaria">Chapisco Sobre Alvenaria (1:0:4)</option>
+                            <option value="emboco_externo">Emboço Externo (1:2:9)</option>
+                            <option value="emboco_interno" selected>Emboço Interno (0:1:4)</option>
+                            <option value="reboco_forros">Reboco de Forros (0:1:2)</option>
+                            <option value="reboco_pintura">Reboco para Pintura/Colagem (0:1:4)</option>
+                            <option value="reboco_externo">Reboco Externo para Pintura (1:1:3)</option>
+                            <option value="cimento_alisado">Cimento Alisado (1:0:1,5)</option>
+                            <option value="assentamento_interno">Assentamento Interno Azulejos (1:1:5)</option>
+                            <option value="assentamento_externo">Assentamento Externo Pastilhas (1:1:6)</option>
+                            <option value="assentamento_litoceramica">Assentamento Externo Litocerâmica (1:0,5:5)</option>
+                            <option value="custom_plaster">Personalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-ruler-combined"></i> Traço de Revestimento (Cimento : Cal : Areia)</h3>
+                        <div class="traco-input">
+                            <div class="traco-part">
+                                <div class="traco-label">Cimento</div>
+                                <div class="traco-value" id="plaster-cement-part">0</div>
+                            </div>
+                            <div class="traco-part">
+                                <div class="traco-label">Cal</div>
+                                <div class="traco-value" id="plaster-lime-part">1</div>
+                            </div>
+                            <div class="traco-part">
+                                <div class="traco-label">Areia</div>
+                                <div class="traco-value" id="plaster-sand-part">4</div>
+                            </div>
+                            <div class="traco-part">
+                                <div class="traco-label">Total Partes</div>
+                                <div class="traco-value" id="plaster-total-parts">5</div>
+                            </div>
+                        </div>
+                        <div class="traco-display" id="plaster-traco-display">Traço: 0 : 1 : 4</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="revestimento-thickness"><i class="fas fa-ruler-vertical"></i> Espessura do Revestimento (NBR 7200)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="revestimento-thickness" min="1" max="25" step="0.5" value="10">
+                            <div class="unit">mm</div>
+                        </div>
+                        <div class="result-details">Espessura máxima sem armadura: 25 mm (2,5 cm)</div>
+                    </div>
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="use-armadura">
+                        <label for="use-armadura">Utilizar armadura para espessura > 25 mm</label>
+                    </div>
+                    
+                    <div class="warning">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Conforme NBR 7200:2015:</strong> A espessura total do revestimento não deve exceder 25 mm sem armadura. Chapisco é obrigatório para aderência do emboço/reboco.
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-table"></i> Tabela de Traços de Referência</h3>
+                        <p><strong>Chapisco:</strong> Sobre Concreto (1:0:3), Sobre Alvenaria (1:0:4)</p>
+                        <p><strong>Emboço:</strong> Externo (1:2:9), Interno (0:1:4)</p>
+                        <p><strong>Reboco:</strong> Externo (1:1:3), Interno (0:1:4), Cimento Alisado (1:0:1,5)</p>
+                        <p><strong>Assentamento:</strong> Interno Azulejos (1:1:5), Externo Pastilhas (1:1:6)</p>
+                    </div>
+                </div>
+                
+                <div id="norms-tab" class="tab-content">
+                    <div class="section-title">
+                        <i class="fas fa-book"></i> Normas Técnicas ABNT
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-info-circle"></i> Normas Brasileiras para Revestimentos</h3>
+                        <p>Principais normas que regulamentam a execução de revestimentos no Brasil:</p>
+                    </div>
+                    
+                    <div class="normas-grid">
+                        <div class="norma-card">
+                            <div class="norma-title">NBR 7200:2015</div>
+                            <div class="norma-description">
+                                <p><strong>Execução de revestimentos de paredes e tetos com argamassas inorgânicas</strong></p>
+                                <p>• Especifica materiais, preparação, execução e controle</p>
+                                <p>• Define espessuras máximas (25 mm sem armadura)</p>
+                                <p>• Estabelece requisitos para chapisco, emboço e reboco</p>
+                            </div>
+                        </div>
+                        
+                        <div class="norma-card">
+                            <div class="norma-title">NBR 13529:2013</div>
+                            <div class="norma-description">
+                                <p><strong>Argamassa para assentamento e revestimento de paredes e tetos</strong></p>
+                                <p>• Especifica requisitos para argamassas industrializadas</p>
+                                <p>• Define classes de resistência e trabalhabilidade</p>
+                                <p>• Estabelece métodos de ensaio e controle de qualidade</p>
+                            </div>
+                        </div>
+                        
+                        <div class="norma-card">
+                            <div class="norma-title">NBR 13749:2013</div>
+                            <div class="norma-description">
+                                <p><strong>Revestimento cerâmico de paredes e pisos</strong></p>
+                                <p>• Especifica materiais e execução de revestimentos cerâmicos</p>
+                                <p>• Define requisitos para argamassas colantes</p>
+                                <p>• Estabelece procedimentos para assentamento</p>
+                            </div>
+                        </div>
+                        
+                        <div class="norma-card">
+                            <div class="norma-title">NBR 15270-1:2017</div>
+                            <div class="norma-description">
+                                <p><strong>Componentes cerâmicos - Blocos e tijolos para alvenaria</strong></p>
+                                <p>• Especifica requisitos para blocos e tijolos cerâmicos</p>
+                                <p>• Define dimensões, resistência e absorção de água</p>
+                                <p>• Estabelece controle de qualidade na produção</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="technical-info">
+                        <h4><i class="fas fa-clipboard-list"></i> Requisitos Técnicos Conforme NBR 7200</h4>
+                        <p><strong>Sequência de Execução:</strong></p>
+                        <p>1. <strong>Chapisco:</strong> Espessura 3-5 mm, obrigatório para aderência</p>
+                        <p>2. <strong>Emboço:</strong> Espessura 15-20 mm, regulariza a superfície</p>
+                        <p>3. <strong>Reboco:</strong> Espessura 5-10 mm, acabamento final</p>
+                        <p><strong>Espessura Total Máxima:</strong> 25 mm sem armadura / 40 mm com armadura</p>
+                        <p><strong>Intervalo entre camadas:</strong> Mínimo 24 horas para secagem</p>
+                        <p><strong>Traços Recomendados:</strong> Reboco externo deve conter cimento (1:1:3) para resistência às intempéries</p>
+                    </div>
+                    
+                    <div class="warning">
+                        <i class="fas fa-exclamation-triangle"></i> <strong>Importante:</strong> As normas técnicas são atualizadas periodicamente. Consulte sempre as versões mais recentes para projetos em execução.
+                    </div>
+                </div>
+                
+                <div id="prices-tab" class="tab-content">
+                    <div class="section-title">
+                        <i class="fas fa-money-bill-wave"></i> Preços e Custos
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="brick-price"><span class="material-icon">🧱</span> Preço do tijolo (unidade)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="brick-price" min="0" step="0.01" value="2.50">
+                            <div class="unit">R$</div>
+                        </div>
+                    </div>
+                    
+                    <div class="materials-grid">
+                        <div class="material-card">
+                            <div class="material-title">Cimento (saco 50kg)</div>
+                            <div class="input-with-unit">
+                                <input type="number" id="cement-price" min="0" step="0.01" value="30.00">
+                                <div class="unit">R$</div>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <div class="material-title">Cal (saco 20kg)</div>
+                            <div class="input-with-unit">
+                                <input type="number" id="lime-price" min="0" step="0.01" value="18.00">
+                                <div class="unit">R$</div>
+                            </div>
+                        </div>
+                        
+                        <div class="material-card">
+                            <div class="material-title">Areia (m³)</div>
+                            <div class="input-with-unit">
+                                <input type="number" id="sand-price" min="0" step="0.01" value="120.00">
+                                <div class="unit">R$</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="labor-assembly"><span class="material-icon">👷</span> Mão de obra de assentamento (por m²)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="labor-assembly" min="0" step="0.01" value="35.00">
+                            <div class="unit">R$</div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="labor-chapisco"><span class="material-icon">🧑‍🔧</span> Mão de obra de chapisco (por m²)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="labor-chapisco" min="0" step="0.01" value="8.00">
+                            <div class="unit">R$</div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="labor-emboco"><span class="material-icon">👨‍🏭</span> Mão de obra de emboço (por m²)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="labor-emboco" min="0" step="0.01" value="15.00">
+                            <div class="unit">R$</div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="labor-reboco"><span class="material-icon">🧑‍🎨</span> Mão de obra de reboco (por m²)</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="labor-reboco" min="0" step="0.01" value="12.00">
+                            <div class="unit">R$</div>
+                        </div>
+                        <div class="result-details">Por face da parede</div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="waste-percentage"><span class="material-icon">📊</span> Percentual de perda/desperdício</label>
+                        <div class="input-with-unit">
+                            <input type="number" id="waste-percentage" min="0" max="50" step="1" value="10">
+                            <div class="unit">%</div>
+                        </div>
+                        <div class="result-details">Percentual adicional para quebras e ajustes</div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="calculate-btn" id="calculate-btn">
+                        <i class="fas fa-calculator"></i> Calcular
+                    </button>
+                    <button class="export-btn" id="export-btn">
+                        <i class="fas fa-file-pdf"></i> Exportar PDF
+                    </button>
+                </div>
+                
+                <div class="note">
+                    <p><strong>Nota:</strong> Todos os cálculos seguem as normas técnicas brasileiras. Os valores são estimativas e podem variar conforme a região, fornecedor e condições específicas da obra.</p>
+                </div>
+            </div>
+            
+            <div class="results-section">
+                <div class="section-title">
+                    <i class="fas fa-chart-bar"></i> Resultados Detalhados
+                </div>
+                
+                <div class="results-container">
+                    <div class="result-card">
+                        <div class="result-title">Custo por metro quadrado</div>
+                        <div class="result-value" id="cost-per-m2">R$ 0,00</div>
+                        <div class="result-details">Custo para cada m² de parede acabada</div>
+                    </div>
+                    
+                    <div class="result-card">
+                        <div class="result-title">Custo total da parede</div>
+                        <div class="result-value" id="total-cost">R$ 0,00</div>
+                        <div class="result-details">Custo total para <span id="wall-area-display">18.0</span> m² de parede acabada</div>
+                    </div>
+                    
+                    <div class="breakdown">
+                        <div class="breakdown-title"><i class="fas fa-list-ol"></i> Quantidades de Materiais</div>
+                        
+                        <div class="breakdown-item">
+                            <span>Tijolos (com perdas)</span>
+                            <span id="qty-bricks">0 unidades</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Cimento (sacos 50kg)</span>
+                            <span id="qty-cement">0 sacos</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Cal (sacos 20kg)</span>
+                            <span id="qty-lime">0 sacos</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Areia (m³)</span>
+                            <span id="qty-sand">0.00 m³</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Quantidade de tijolos por m²</span>
+                            <span id="bricks-per-m2">0 un/m²</span>
+                        </div>
+                    </div>
+                    
+                    <div class="breakdown">
+                        <div class="breakdown-title"><i class="fas fa-dollar-sign"></i> Composição de Custos por m²</div>
+                        
+                        <div class="breakdown-item">
+                            <span>Tijolos</span>
+                            <span id="breakdown-bricks">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Cimento</span>
+                            <span id="breakdown-cement">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Cal</span>
+                            <span id="breakdown-lime">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Areia</span>
+                            <span id="breakdown-sand">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Mão de obra de assentamento</span>
+                            <span id="breakdown-labor-assembly">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span>Mão de obra de revestimento</span>
+                            <span id="breakdown-labor-plaster">R$ 0,00</span>
+                        </div>
+                        
+                        <div class="breakdown-item">
+                            <span><strong>Total por m²</strong></span>
+                            <span id="breakdown-total-per-m2"><strong>R$ 0,00</strong></span>
+                        </div>
+                    </div>
+                    
+                    <div class="technical-info">
+                        <h4><i class="fas fa-calculator"></i> Dados Técnicos do Cálculo</h4>
+                        <div id="technical-details">
+                            <p>• Área útil do tijolo: <span id="brick-area">0.00</span> m²</p>
+                            <p>• Área do tijolo com junta: <span id="brick-area-with-joint">0.00</span> m²</p>
+                            <p>• Volume de argamassa por tijolo: <span id="mortar-per-brick">0.000</span> m³</p>
+                            <p>• Espessura da junta: <span id="joint-display">1.5</span> cm</p>
+                            <p>• Espessura do revestimento: <span id="revestimento-display">10</span> mm</p>
+                            <p>• Perda/desperdício: <span id="waste-display">10</span>%</p>
+                            <p>• Traço assentamento: <span id="traco-mortar-display">1:2:8</span></p>
+                            <p>• Traço revestimento: <span id="traco-plaster-display">0:1:4</span></p>
+                            <p>• Norma principal: NBR 7200:2015</p>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3><i class="fas fa-clipboard-check"></i> Conformidade com Normas ABNT</h3>
+                        <div id="norm-compliance">
+                            <p>✓ Espessura do revestimento dentro do limite da NBR 7200</p>
+                            <p>✓ Traço de argamassa conforme especificações técnicas</p>
+                            <p>✓ Chapisco incluído para garantia de aderência</p>
+                            <p>✓ Sequência de execução conforme normas</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="note">
+                    <p><strong>Informações técnicas conforme NBR:</strong></p>
+                    <p>• NBR 7200:2015 - Espessura máxima sem armadura: 25 mm</p>
+                    <p>• NBR 15270-1:2017 - Junta de assentamento: 1.0 a 1.5 cm</p>
+                    <p>• NBR 13529:2013 - Requisitos para argamassas industrializadas</p>
+                    <p>• Chapisco obrigatório para aderência do revestimento</p>
+                    <p>• Reboco externo deve conter cimento para resistência às intempéries</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos de entrada
+            const wallLengthInput = document.getElementById('wall-length');
+            const wallHeightInput = document.getElementById('wall-height');
+            const brickTypeSelect = document.getElementById('brick-type');
+            const brickWidthInput = document.getElementById('brick-width');
+            const brickHeightInput = document.getElementById('brick-height');
+            const brickLengthInput = document.getElementById('brick-length');
+            const jointThicknessInput = document.getElementById('joint-thickness');
+            const brickPriceInput = document.getElementById('brick-price');
+            const cementPriceInput = document.getElementById('cement-price');
+            const limePriceInput = document.getElementById('lime-price');
+            const sandPriceInput = document.getElementById('sand-price');
+            const laborAssemblyInput = document.getElementById('labor-assembly');
+            const laborChapiscoInput = document.getElementById('labor-chapisco');
+            const laborEmbocoInput = document.getElementById('labor-emboco');
+            const laborRebocoInput = document.getElementById('labor-reboco');
+            const twoSidesCheckbox = document.getElementById('two-sides');
+            const wastePercentageInput = document.getElementById('waste-percentage');
+            const revestimentoThicknessInput = document.getElementById('revestimento-thickness');
+            const useArmaduraCheckbox = document.getElementById('use-armadura');
+            
+            // Elementos do traço
+            const mortarTracoTypeSelect = document.getElementById('mortar-traco-type');
+            const plasterTracoTypeSelect = document.getElementById('plaster-traco-type');
+            
+            // Elementos de revestimento
+            const revestimentoOptions = document.querySelectorAll('.revestimento-option');
+            
+            // Elementos de exibição
+            const displayLengthElement = document.getElementById('display-length');
+            const displayHeightElement = document.getElementById('display-height');
+            const displayAreaElement = document.getElementById('display-area');
+            const displayVolumeElement = document.getElementById('display-volume');
+            const wallAreaDisplayElement = document.getElementById('wall-area-display');
+            
+            // Elementos de resultado
+            const costPerM2Element = document.getElementById('cost-per-m2');
+            const totalCostElement = document.getElementById('total-cost');
+            const qtyBricksElement = document.getElementById('qty-bricks');
+            const qtyCementElement = document.getElementById('qty-cement');
+            const qtyLimeElement = document.getElementById('qty-lime');
+            const qtySandElement = document.getElementById('qty-sand');
+            const bricksPerM2Element = document.getElementById('bricks-per-m2');
+            const breakdownBricksElement = document.getElementById('breakdown-bricks');
+            const breakdownCementElement = document.getElementById('breakdown-cement');
+            const breakdownLimeElement = document.getElementById('breakdown-lime');
+            const breakdownSandElement = document.getElementById('breakdown-sand');
+            const breakdownLaborAssemblyElement = document.getElementById('breakdown-labor-assembly');
+            const breakdownLaborPlasterElement = document.getElementById('breakdown-labor-plaster');
+            const breakdownTotalPerM2Element = document.getElementById('breakdown-total-per-m2');
+            
+            // Elementos de dados técnicos
+            const brickAreaElement = document.getElementById('brick-area');
+            const brickAreaWithJointElement = document.getElementById('brick-area-with-joint');
+            const mortarPerBrickElement = document.getElementById('mortar-per-brick');
+            const jointDisplayElement = document.getElementById('joint-display');
+            const wasteDisplayElement = document.getElementById('waste-display');
+            const tracoMortarDisplayElement = document.getElementById('traco-mortar-display');
+            const tracoPlasterDisplayElement = document.getElementById('traco-plaster-display');
+            const revestimentoDisplayElement = document.getElementById('revestimento-display');
+            
+            // Elementos de traço
+            const mortarCementPartElement = document.getElementById('mortar-cement-part');
+            const mortarLimePartElement = document.getElementById('mortar-lime-part');
+            const mortarSandPartElement = document.getElementById('mortar-sand-part');
+            const mortarTotalPartsElement = document.getElementById('mortar-total-parts');
+            const mortarTracoDisplayElement = document.getElementById('mortar-traco-display');
+            
+            const plasterCementPartElement = document.getElementById('plaster-cement-part');
+            const plasterLimePartElement = document.getElementById('plaster-lime-part');
+            const plasterSandPartElement = document.getElementById('plaster-sand-part');
+            const plasterTotalPartsElement = document.getElementById('plaster-total-parts');
+            const plasterTracoDisplayElement = document.getElementById('plaster-traco-display');
+            
+            // Botões
+            const calculateBtn = document.getElementById('calculate-btn');
+            const exportBtn = document.getElementById('export-btn');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            
+            // Tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            // Configurações padrão para tipos de tijolo
+            const brickTypes = {
+                '9holes': { width: 14.0, height: 19.0, length: 29.0 },
+                '8holes': { width: 11.5, height: 14.0, length: 24.0 },
+                '6holes': { width: 9.0, height: 14.0, length: 19.0 },
+                'baiano': { width: 9.0, height: 19.0, length: 19.0 }
+            };
+            
+            // Configurações de traço de argamassa para ASSENTAMENTO (corrigidos)
+            const mortarTracoTypes = {
+                'common': { cement: 1, lime: 2, sand: 8, name: 'Tijolo Comum/Alicerce' },
+                'laminated': { cement: 1, lime: 1, sand: 6, name: 'Laminado 1 tijolo' },
+                'perforated': { cement: 1, lime: 2, sand: 8, name: 'Tijolo Furado' },
+                'concrete19': { cement: 1, lime: 0.5, sand: 8, name: 'Bloco Concreto 19cm' },
+                'concrete6': { cement: 1, lime: 0.5, sand: 6, name: 'Bloco Concreto 6,5cm' },
+                'glass': { cement: 1, lime: 0.5, sand: 5, name: 'Blocos de Vidro' },
+                'stone': { cement: 1, lime: 0, sand: 4, name: 'Pedras Irregulares' },
+                'custom_mortar': { cement: 1, lime: 2, sand: 8, name: 'Personalizado' }
+            };
+            
+            // Configurações de traço de argamassa para REVESTIMENTO (CORRIGIDOS - com cimento em reboco externo)
+            const plasterTracoTypes = {
+                'chapisco_concreto': { cement: 1, lime: 0, sand: 3, name: 'Chapisco Sobre Concreto' },
+                'chapisco_alvenaria': { cement: 1, lime: 0, sand: 4, name: 'Chapisco Sobre Alvenaria' },
+                'emboco_externo': { cement: 1, lime: 2, sand: 9, name: 'Emboço Externo' },
+                'emboco_interno': { cement: 0, lime: 1, sand: 4, name: 'Emboço Interno' },
+                'reboco_forros': { cement: 0, lime: 1, sand: 2, name: 'Reboco de Forros' },
+                'reboco_pintura': { cement: 0, lime: 1, sand: 4, name: 'Reboco para Pintura/Colagem' },
+                'reboco_externo': { cement: 1, lime: 1, sand: 3, name: 'Reboco Externo para Pintura' },
+                'cimento_alisado': { cement: 1, lime: 0, sand: 1.5, name: 'Cimento Alisado' },
+                'assentamento_interno': { cement: 1, lime: 1, sand: 5, name: 'Assentamento Interno Azulejos' },
+                'assentamento_externo': { cement: 1, lime: 1, sand: 6, name: 'Assentamento Externo Pastilhas' },
+                'assentamento_litoceramica': { cement: 1, lime: 0.5, sand: 5, name: 'Assentamento Externo Litocerâmica' },
+                'custom_plaster': { cement: 0, lime: 1, sand: 4, name: 'Personalizado' }
+            };
+            
+            // Configurações de camadas de revestimento
+            const revestimentoConfig = {
+                'chapisco': { enabled: true, thickness: 0.005 }, // 5 mm
+                'emboco': { enabled: true, thickness: 0.015 }, // 15 mm
+                'reboco': { enabled: true, thickness: 0.010 }  // 10 mm
+            };
+            
+            // Configuração das tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    
+                    // Remove active class de todas as tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tabContents.forEach(tc => tc.classList.remove('active'));
+                    
+                    // Adiciona active class na tab clicada
+                    tab.classList.add('active');
+                    document.getElementById(`${tabId}-tab`).classList.add('active');
+                });
+            });
+            
+            // Configuração das opções de revestimento
+            revestimentoOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const type = this.getAttribute('data-type');
+                    const isActive = this.classList.contains('active');
+                    
+                    if (isActive) {
+                        this.classList.remove('active');
+                        revestimentoConfig[type].enabled = false;
+                    } else {
+                        this.classList.add('active');
+                        revestimentoConfig[type].enabled = true;
+                    }
+                    
+                    calculateCosts();
+                });
+            });
+            
+            // Atualiza dimensões do tijolo conforme seleção
+            brickTypeSelect.addEventListener('change', function() {
+                const selectedType = this.value;
+                
+                if (selectedType !== 'custom') {
+                    const brick = brickTypes[selectedType];
+                    brickWidthInput.value = brick.width;
+                    brickHeightInput.value = brick.height;
+                    brickLengthInput.value = brick.length;
+                    
+                    // Desabilita inputs se não for custom
+                    brickWidthInput.disabled = true;
+                    brickHeightInput.disabled = true;
+                    brickLengthInput.disabled = true;
+                } else {
+                    // Habilita inputs para custom
+                    brickWidthInput.disabled = false;
+                    brickHeightInput.disabled = false;
+                    brickLengthInput.disabled = false;
+                }
+                
+                calculateCosts();
+            });
+            
+            // Atualiza traço da argamassa de assentamento
+            mortarTracoTypeSelect.addEventListener('change', function() {
+                updateMortarTraco();
+                calculateCosts();
+            });
+            
+            // Atualiza traço da argamassa de revestimento
+            plasterTracoTypeSelect.addEventListener('change', function() {
+                updatePlasterTraco();
+                calculateCosts();
+            });
+            
+            // Atualiza espessura do revestimento
+            revestimentoThicknessInput.addEventListener('input', calculateCosts);
+            useArmaduraCheckbox.addEventListener('change', calculateCosts);
+            
+            // Função para atualizar traço de assentamento
+            function updateMortarTraco() {
+                const selectedType = mortarTracoTypeSelect.value;
+                const traco = mortarTracoTypes[selectedType];
+                
+                mortarCementPartElement.textContent = traco.cement;
+                mortarLimePartElement.textContent = traco.lime;
+                mortarSandPartElement.textContent = traco.sand;
+                const totalParts = traco.cement + traco.lime + traco.sand;
+                mortarTotalPartsElement.textContent = totalParts;
+                mortarTracoDisplayElement.textContent = `Traço: ${traco.cement} : ${traco.lime} : ${traco.sand}`;
+            }
+            
+            // Função para atualizar traço de revestimento
+            function updatePlasterTraco() {
+                const selectedType = plasterTracoTypeSelect.value;
+                const traco = plasterTracoTypes[selectedType];
+                
+                plasterCementPartElement.textContent = traco.cement;
+                plasterLimePartElement.textContent = traco.lime;
+                plasterSandPartElement.textContent = traco.sand;
+                const totalParts = traco.cement + traco.lime + traco.sand;
+                plasterTotalPartsElement.textContent = totalParts;
+                plasterTracoDisplayElement.textContent = `Traço: ${traco.cement} : ${traco.lime} : ${traco.sand}`;
+            }
+            
+            // Inicializa com o tipo selecionado
+            brickTypeSelect.dispatchEvent(new Event('change'));
+            updateMortarTraco();
+            updatePlasterTraco();
+            
+            // Função para formatar valores monetários
+            function formatCurrency(value) {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(value);
+            }
+            
+            // Função para formatar números decimais
+            function formatNumber(value, decimals = 2) {
+                return new Intl.NumberFormat('pt-BR', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(value);
+            }
+            
+            // Função para atualizar as dimensões exibidas
+            function updateWallDimensions() {
+                const wallLength = parseFloat(wallLengthInput.value) || 0;
+                const wallHeight = parseFloat(wallHeightInput.value) || 0;
+                const wallArea = wallLength * wallHeight;
+                
+                displayLengthElement.textContent = formatNumber(wallLength, 1) + ' m';
+                displayHeightElement.textContent = formatNumber(wallHeight, 1) + ' m';
+                displayAreaElement.textContent = formatNumber(wallArea, 1) + ' m²';
+                wallAreaDisplayElement.textContent = formatNumber(wallArea, 1);
+                
+                return wallArea;
+            }
+            
+            // Função para calcular quantidade de tijolos por m²
+            function calculateBricksPerM2(brickHeight, brickLength, jointThickness) {
+                // Converte de cm para m
+                const heightM = brickHeight / 100;
+                const lengthM = brickLength / 100;
+                const jointM = jointThickness / 100;
+                
+                // Área do tijolo com junta
+                const areaWithJoint = (heightM + jointM) * (lengthM + jointM);
+                
+                // Quantidade de tijolos por m²
+                const bricksPerM2 = 1 / areaWithJoint;
+                
+                return {
+                    bricksPerM2: bricksPerM2,
+                    areaWithJoint: areaWithJoint,
+                    brickArea: heightM * lengthM
+                };
+            }
+            
+            // Função para calcular volume de argamassa de assentamento
+            function calculateMortarVolume(brickHeight, brickLength, brickWidth, jointThickness, bricksPerM2, brickArea) {
+                // Converte de cm para m
+                const heightM = brickHeight / 100;
+                const lengthM = brickLength / 100;
+                const widthM = brickWidth / 100;
+                const jointM = jointThickness / 100;
+                
+                // Método 1: Volume por diferença de áreas (conforme NBR)
+                // Volume = (1 - área dos tijolos) × espessura do tijolo
+                const areaBricks = brickArea * bricksPerM2;
+                const mortarVolumePerM2 = (1 - areaBricks) * widthM;
+                
+                // Método alternativo: cálculo por juntas
+                // Volume por tijolo = (junta horizontal + junta vertical) × espessura do tijolo
+                const mortarPerBrick = jointM * (heightM + lengthM) * widthM;
+                const mortarVolumePerM2Alt = mortarPerBrick * bricksPerM2;
+                
+                // Usamos a média dos dois métodos para maior precisão
+                const finalVolume = (mortarVolumePerM2 + mortarVolumePerM2Alt) / 2;
+                
+                return {
+                    volumePerM2: finalVolume,
+                    volumePerBrick: mortarPerBrick
+                };
+            }
+            
+            // Função para calcular materiais por traço
+            function calculateMaterialsByTraco(volume, traco) {
+                // Obter as partes do traço
+                const cementPart = traco.cement;
+                const limePart = traco.lime;
+                const sandPart = traco.sand;
+                
+                // Calcular o total de partes
+                const totalParts = cementPart + limePart + sandPart;
+                
+                if (totalParts === 0) return { cement: 0, lime: 0, sand: 0 };
+                
+                // Calcular o volume de cada componente
+                const cementVolume = (cementPart / totalParts) * volume;
+                const limeVolume = (limePart / totalParts) * volume;
+                const sandVolume = (sandPart / totalParts) * volume;
+                
+                // Converter para unidades comerciais
+                // Cimento: 1 saco de 50kg = 0,035 m³ (densidade ~ 1.428 kg/m³)
+                // Cal: 1 saco de 20kg = 0,014 m³ (densidade ~ 1.428 kg/m³)
+                // Areia: mantém em m³
+                
+                const cementBags = cementVolume / 0.035;
+                const limeBags = limeVolume / 0.014;
+                
+                return {
+                    cement: cementBags,
+                    lime: limeBags,
+                    sand: sandVolume,
+                    cementVolume: cementVolume,
+                    limeVolume: limeVolume,
+                    sandVolume: sandVolume
+                };
+            }
+            
+            // Função para verificar conformidade com normas
+            function checkNormCompliance(revestimentoThickness, useArmadura, plasterTracoType) {
+                const compliance = [];
+                const warnings = [];
+                
+                // Verificar espessura conforme NBR 7200
+                if (revestimentoThickness <= 25) {
+                    compliance.push("✓ Espessura do revestimento dentro do limite da NBR 7200 (25 mm sem armadura)");
+                } else if (revestimentoThickness <= 40 && useArmadura) {
+                    compliance.push("✓ Espessura do revestimento com armadura conforme NBR 7200 (até 40 mm)");
+                } else if (revestimentoThickness > 40) {
+                    warnings.push("⚠️ Espessura excede o limite máximo da NBR 7200 (40 mm com armadura)");
+                } else if (revestimentoThickness > 25 && !useArmadura) {
+                    warnings.push("⚠️ Espessura acima de 25 mm requer armadura conforme NBR 7200");
+                }
+                
+                // Verificar chapisco obrigatório
+                if (revestimentoConfig.chapisco.enabled) {
+                    compliance.push("✓ Chapisco incluído conforme NBR 7200 para garantia de aderência");
+                } else {
+                    warnings.push("⚠️ Chapisco é obrigatório conforme NBR 7200 para aderência do revestimento");
+                }
+                
+                // Verificar sequência de execução
+                const hasEmboço = revestimentoConfig.emboco.enabled;
+                const hasReboco = revestimentoConfig.reboco.enabled;
+                
+                if (hasEmboço && hasReboco) {
+                    compliance.push("✓ Sequência completa: Chapisco → Emboço → Reboco conforme NBR 7200");
+                } else if (hasEmboço) {
+                    compliance.push("✓ Sequência: Chapisco → Emboço conforme NBR 7200");
+                } else if (hasReboco) {
+                    compliance.push("✓ Sequência: Chapisco → Reboco conforme NBR 7200");
+                }
+                
+                // Verificar espessura da junta
+                const jointThickness = parseFloat(jointThicknessInput.value) || 1.5;
+                if (jointThickness >= 1.0 && jointThickness <= 1.5) {
+                    compliance.push("✓ Espessura da junta de assentamento conforme NBR 15270-1:2017 (1.0 a 1.5 cm)");
+                } else {
+                    warnings.push("⚠️ Espessura da junta fora do recomendado pela NBR 15270-1:2017");
+                }
+                
+                // Verificar traço de reboco externo
+                if (plasterTracoType === 'reboco_externo') {
+                    compliance.push("✓ Traço de reboco externo contém cimento para resistência às intempéries");
+                }
+                
+                return { compliance, warnings };
+            }
+            
+            // Função principal para calcular custos
+            function calculateCosts() {
+                // Obter área da parede
+                const wallArea = updateWallDimensions();
+                
+                // Obter dimensões do tijolo e junta
+                const brickWidth = parseFloat(brickWidthInput.value) || 0;
+                const brickHeight = parseFloat(brickHeightInput.value) || 0;
+                const brickLength = parseFloat(brickLengthInput.value) || 0;
+                const jointThickness = parseFloat(jointThicknessInput.value) || 1.5;
+                
+                // Obter preços
+                const brickPrice = parseFloat(brickPriceInput.value) || 0;
+                const cementPrice = parseFloat(cementPriceInput.value) || 0;
+                const limePrice = parseFloat(limePriceInput.value) || 0;
+                const sandPrice = parseFloat(sandPriceInput.value) || 0;
+                const laborAssembly = parseFloat(laborAssemblyInput.value) || 0;
+                const laborChapisco = parseFloat(laborChapiscoInput.value) || 0;
+                const laborEmboco = parseFloat(laborEmbocoInput.value) || 0;
+                const laborReboco = parseFloat(laborRebocoInput.value) || 0;
+                const twoSides = twoSidesCheckbox.checked;
+                const wastePercentage = parseFloat(wastePercentageInput.value) || 0;
+                const revestimentoThickness = parseFloat(revestimentoThicknessInput.value) || 10;
+                const useArmadura = useArmaduraCheckbox.checked;
+                
+                // Obter traços
+                const mortarTracoType = mortarTracoTypeSelect.value;
+                const plasterTracoType = plasterTracoTypeSelect.value;
+                const mortarTraco = mortarTracoTypes[mortarTracoType];
+                const plasterTraco = plasterTracoTypes[plasterTracoType];
+                
+                // Calcular quantidade de tijolos por m²
+                const brickCalculation = calculateBricksPerM2(brickHeight, brickLength, jointThickness);
+                const bricksPerM2 = brickCalculation.bricksPerM2;
+                const brickArea = brickCalculation.brickArea;
+                
+                // Calcular volume de argamassa de assentamento
+                const mortarCalculation = calculateMortarVolume(
+                    brickHeight, brickLength, brickWidth, jointThickness, bricksPerM2, brickArea
+                );
+                const mortarVolumePerM2 = mortarCalculation.volumePerM2;
+                const mortarVolumePerBrick = mortarCalculation.volumePerBrick;
+                
+                // Calcular volume total de argamassa de assentamento
+                const totalMortarVolume = mortarVolumePerM2 * wallArea;
+                
+                // Calcular volume de revestimento
+                let totalRevestimentoVolume = 0;
+                
+                // Espessura total do revestimento em metros
+                const revestimentoThicknessM = revestimentoThickness / 1000; // Converter mm para m
+                
+                // Calcular volume para cada camada habilitada
+                if (revestimentoConfig.chapisco.enabled) {
+                    totalRevestimentoVolume += revestimentoConfig.chapisco.thickness * wallArea;
+                }
+                
+                if (revestimentoConfig.emboco.enabled) {
+                    totalRevestimentoVolume += revestimentoConfig.emboco.thickness * wallArea;
+                }
+                
+                if (revestimentoConfig.reboco.enabled) {
+                    totalRevestimentoVolume += revestimentoConfig.reboco.thickness * wallArea;
+                }
+                
+                // Multiplicar por número de faces
+                if (twoSides) {
+                    totalRevestimentoVolume *= 2;
+                }
+                
+                // Calcular materiais necessários por traço
+                const mortarMaterials = calculateMaterialsByTraco(totalMortarVolume, mortarTraco);
+                const revestimentoMaterials = calculateMaterialsByTraco(totalRevestimentoVolume, plasterTraco);
+                
+                // Aplicar fator de perda
+                const wasteFactor = 1 + (wastePercentage / 100);
+                
+                // Quantidades totais com perdas
+                const totalCementBags = Math.ceil((mortarMaterials.cement + revestimentoMaterials.cement) * wasteFactor);
+                const totalLimeBags = Math.ceil((mortarMaterials.lime + revestimentoMaterials.lime) * wasteFactor);
+                const totalSandVolume = (mortarMaterials.sand + revestimentoMaterials.sand) * wasteFactor;
+                
+                // Cálculos por m²
+                const brickCostPerM2 = brickPrice * bricksPerM2;
+                const cementCostPerM2 = ((mortarMaterials.cement + revestimentoMaterials.cement) * cementPrice) / wallArea;
+                const limeCostPerM2 = ((mortarMaterials.lime + revestimentoMaterials.lime) * limePrice) / wallArea;
+                const sandCostPerM2 = ((mortarMaterials.sand + revestimentoMaterials.sand) * sandPrice) / wallArea;
+                
+                // Calcular mão de obra de revestimento
+                let laborRevestimentoPerM2 = 0;
+                if (revestimentoConfig.chapisco.enabled) laborRevestimentoPerM2 += laborChapisco;
+                if (revestimentoConfig.emboco.enabled) laborRevestimentoPerM2 += laborEmboco;
+                if (revestimentoConfig.reboco.enabled) laborRevestimentoPerM2 += laborReboco;
+                
+                // Multiplicar por número de faces
+                if (twoSides) {
+                    laborRevestimentoPerM2 *= 2;
+                }
+                
+                // Custo total por m²
+                const totalCostPerM2 = brickCostPerM2 + cementCostPerM2 + limeCostPerM2 + sandCostPerM2 + laborAssembly + laborRevestimentoPerM2;
+                
+                // Custo total da parede
+                const totalWallCost = totalCostPerM2 * wallArea;
+                
+                // Quantidade total de tijolos
+                const totalBricks = Math.ceil(bricksPerM2 * wallArea * wasteFactor);
+                
+                // Verificar conformidade com normas
+                const normCompliance = checkNormCompliance(revestimentoThickness, useArmadura, plasterTracoType);
+                
+                // Atualizar a interface com os resultados
+                costPerM2Element.textContent = formatCurrency(totalCostPerM2);
+                totalCostElement.textContent = formatCurrency(totalWallCost);
+                
+                qtyBricksElement.textContent = `${totalBricks} unidades`;
+                qtyCementElement.textContent = `${totalCementBags} sacos`;
+                qtyLimeElement.textContent = `${totalLimeBags} sacos`;
+                qtySandElement.textContent = `${formatNumber(totalSandVolume, 3)} m³`;
+                bricksPerM2Element.textContent = `${formatNumber(bricksPerM2, 1)} un/m²`;
+                
+                breakdownBricksElement.textContent = formatCurrency(brickCostPerM2);
+                breakdownCementElement.textContent = formatCurrency(cementCostPerM2);
+                breakdownLimeElement.textContent = formatCurrency(limeCostPerM2);
+                breakdownSandElement.textContent = formatCurrency(sandCostPerM2);
+                breakdownLaborAssemblyElement.textContent = formatCurrency(laborAssembly);
+                breakdownLaborPlasterElement.textContent = formatCurrency(laborRevestimentoPerM2);
+                breakdownTotalPerM2Element.textContent = formatCurrency(totalCostPerM2);
+                
+                // Atualizar dados técnicos
+                brickAreaElement.textContent = formatNumber(brickArea, 3);
+                brickAreaWithJointElement.textContent = formatNumber(brickCalculation.areaWithJoint, 3);
+                mortarPerBrickElement.textContent = formatNumber(mortarVolumePerBrick, 4);
+                jointDisplayElement.textContent = jointThickness;
+                wasteDisplayElement.textContent = wastePercentage;
+                tracoMortarDisplayElement.textContent = `${mortarTraco.cement}:${mortarTraco.lime}:${mortarTraco.sand}`;
+                tracoPlasterDisplayElement.textContent = `${plasterTraco.cement}:${plasterTraco.lime}:${plasterTraco.sand}`;
+                revestimentoDisplayElement.textContent = revestimentoThickness;
+                
+                // Atualizar volume total de argamassa
+                displayVolumeElement.textContent = `${formatNumber(totalMortarVolume + totalRevestimentoVolume, 3)} m³`;
+                
+                // Atualizar conformidade com normas
+                const normComplianceElement = document.getElementById('norm-compliance');
+                let complianceHTML = '';
+                
+                normCompliance.compliance.forEach(item => {
+                    complianceHTML += `<p style="color: #28a745; margin-bottom: 5px;">${item}</p>`;
+                });
+                
+                normCompliance.warnings.forEach(item => {
+                    complianceHTML += `<p style="color: #dc3545; margin-bottom: 5px;">${item}</p>`;
+                });
+                
+                normComplianceElement.innerHTML = complianceHTML;
+                
+                // Retornar os dados calculados para uso no PDF
+                return {
+                    wallLength: parseFloat(wallLengthInput.value) || 0,
+                    wallHeight: parseFloat(wallHeightInput.value) || 0,
+                    wallArea: wallArea,
+                    brickWidth: brickWidth,
+                    brickHeight: brickHeight,
+                    brickLength: brickLength,
+                    brickType: brickTypeSelect.options[brickTypeSelect.selectedIndex].text,
+                    jointThickness: jointThickness,
+                    wastePercentage: wastePercentage,
+                    twoSides: twoSides,
+                    brickPrice: brickPrice,
+                    cementPrice: cementPrice,
+                    limePrice: limePrice,
+                    sandPrice: sandPrice,
+                    laborAssembly: laborAssembly,
+                    laborRevestimento: laborRevestimentoPerM2,
+                    mortarTraco: mortarTraco,
+                    plasterTraco: plasterTraco,
+                    bricksPerM2: bricksPerM2,
+                    totalBricks: totalBricks,
+                    totalCementBags: totalCementBags,
+                    totalLimeBags: totalLimeBags,
+                    totalSandVolume: totalSandVolume,
+                    brickCostPerM2: brickCostPerM2,
+                    cementCostPerM2: cementCostPerM2,
+                    limeCostPerM2: limeCostPerM2,
+                    sandCostPerM2: sandCostPerM2,
+                    laborRevestimentoPerM2: laborRevestimentoPerM2,
+                    totalCostPerM2: totalCostPerM2,
+                    totalWallCost: totalWallCost,
+                    calculationDate: new Date().toLocaleDateString('pt-BR'),
+                    mortarVolume: totalMortarVolume,
+                    revestimentoVolume: totalRevestimentoVolume,
+                    revestimentoThickness: revestimentoThickness,
+                    useArmadura: useArmadura,
+                    revestimentoConfig: JSON.parse(JSON.stringify(revestimentoConfig)),
+                    normCompliance: normCompliance,
+                    plasterTracoType: plasterTracoType
+                };
+            }
+            
+            // Função para gerar PDF
+            function generatePDF() {
+                // Mostra o loading
+                loadingOverlay.style.display = 'flex';
+                
+                // Obtém os dados calculados
+                const data = calculateCosts();
+                
+                // Aguarda um momento para garantir que os cálculos foram atualizados
+                setTimeout(() => {
+                    try {
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF('p', 'mm', 'a4');
+                        
+                        // Configurações iniciais
+                        const pageWidth = doc.internal.pageSize.getWidth();
+                        let yPosition = 20;
+                        
+                        // Cabeçalho
+                        doc.setFillColor(26, 58, 95);
+                        doc.rect(0, 0, pageWidth, 30, 'F');
+                        doc.setTextColor(255, 255, 255);
+                        doc.setFontSize(20);
+                        doc.text('RELATÓRIO DE CÁLCULO DE ALVENARIA E REVESTIMENTOS', pageWidth / 2, 15, { align: 'center' });
+                        
+                        doc.setFontSize(12);
+                        doc.text('Conforme Normas ABNT NBR 7200:2015, NBR 13529:2013 e NBR 15270-1:2017', pageWidth / 2, 22, { align: 'center' });
+                        
+                        // Data do relatório
+                        doc.setFontSize(10);
+                        doc.text(`Data: ${data.calculationDate}`, pageWidth - 20, 40, { align: 'right' });
+                        
+                        // Resetar cor para preto
+                        doc.setTextColor(0, 0, 0);
+                        yPosition = 50;
+                        
+                        // Seção 1: Informações da Parede
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('1. INFORMAÇÕES DA PAREDE', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(11);
+                        const wallInfo = [
+                            [`Comprimento: ${formatNumber(data.wallLength, 2)} m`, `Altura: ${formatNumber(data.wallHeight, 2)} m`],
+                            [`Área total: ${formatNumber(data.wallArea, 2)} m²`, `Revestimento: ${data.twoSides ? 'Duas faces' : 'Uma face'}`],
+                            [`Espessura revestimento: ${data.revestimentoThickness} mm`, `Armadura: ${data.useArmadura ? 'Sim' : 'Não'}`]
+                        ];
+                        
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [],
+                            body: wallInfo,
+                            theme: 'grid',
+                            headStyles: { fillColor: [44, 82, 130] },
+                            margin: { left: 15, right: 15 },
+                            tableWidth: pageWidth - 30,
+                            columnStyles: { 0: { cellWidth: 85 }, 1: { cellWidth: 85 } }
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                        
+                        // Seção 2: Especificações do Tijolo
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('2. ESPECIFICAÇÕES DO TIJOLO', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(11);
+                        const brickInfo = [
+                            [`Tipo: ${data.brickType}`, `Junta: ${formatNumber(data.jointThickness, 1)} cm`],
+                            [`Dimensões: ${formatNumber(data.brickWidth, 1)} x ${formatNumber(data.brickHeight, 1)} x ${formatNumber(data.brickLength, 1)} cm`, `Perdas: ${formatNumber(data.wastePercentage, 0)}%`],
+                            [`Quantidade por m²: ${formatNumber(data.bricksPerM2, 1)} un`, `Volume argamassa: ${formatNumber(data.mortarVolume, 3)} m³`]
+                        ];
+                        
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [],
+                            body: brickInfo,
+                            theme: 'grid',
+                            headStyles: { fillColor: [44, 82, 130] },
+                            margin: { left: 15, right: 15 },
+                            tableWidth: pageWidth - 30
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                        
+                        // Seção 3: Camadas de Revestimento
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('3. CAMADAS DE REVESTIMENTO (NBR 7200:2015)', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(11);
+                        const revestimentoLayers = [
+                            ['Camada', 'Espessura (mm)', 'Status'],
+                            ['Chapisco', '3-5', data.revestimentoConfig.chapisco.enabled ? 'Incluído' : 'Não incluído'],
+                            ['Emboço', '15-20', data.revestimentoConfig.emboco.enabled ? 'Incluído' : 'Não incluído'],
+                            ['Reboco', '5-10', data.revestimentoConfig.reboco.enabled ? 'Incluído' : 'Não incluído']
+                        ];
+                        
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [revestimentoLayers[0]],
+                            body: revestimentoLayers.slice(1),
+                            theme: 'grid',
+                            headStyles: { fillColor: [44, 82, 130], textColor: [255, 255, 255] },
+                            margin: { left: 15, right: 15 },
+                            tableWidth: pageWidth - 30,
+                            columnStyles: { 
+                                0: { cellWidth: 60 },
+                                1: { cellWidth: 60, halign: 'center' },
+                                2: { cellWidth: 60, halign: 'center' }
+                            }
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                        
+                        // Seção 4: Traços de Argamassa
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('4. TRAÇOS DE ARGAMASSA (Cimento:Cal:Areia)', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(11);
+                        const tracoInfo = [
+                            ['Tipo', 'Cimento', 'Cal', 'Areia', 'Proporção'],
+                            ['Assentamento', data.mortarTraco.cement, data.mortarTraco.lime, data.mortarTraco.sand, `${data.mortarTraco.cement}:${data.mortarTraco.lime}:${data.mortarTraco.sand}`],
+                            ['Revestimento', data.plasterTraco.cement, data.plasterTraco.lime, data.plasterTraco.sand, `${data.plasterTraco.cement}:${data.plasterTraco.lime}:${data.plasterTraco.sand}`]
+                        ];
+                        
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [tracoInfo[0]],
+                            body: tracoInfo.slice(1),
+                            theme: 'grid',
+                            headStyles: { fillColor: [44, 82, 130], textColor: [255, 255, 255] },
+                            margin: { left: 15, right: 15 },
+                            tableWidth: pageWidth - 30
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                        
+                        // Seção 5: Quantidades de Materiais
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('5. QUANTIDADES DE MATERIAIS', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(11);
+                        const materialsData = [
+                            ['Material', 'Quantidade', 'Unidade'],
+                            ['Tijolos', formatNumber(data.totalBricks, 0), 'unidades'],
+                            ['Cimento', formatNumber(data.totalCementBags, 0), 'sacos (50kg)'],
+                            ['Cal', formatNumber(data.totalLimeBags, 0), 'sacos (20kg)'],
+                            ['Areia', formatNumber(data.totalSandVolume, 3), 'm³']
+                        ];
+                        
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [materialsData[0]],
+                            body: materialsData.slice(1),
+                            theme: 'grid',
+                            headStyles: { fillColor: [44, 82, 130], textColor: [255, 255, 255] },
+                            margin: { left: 15, right: 15 },
+                            tableWidth: pageWidth - 30,
+                            columnStyles: { 
+                                0: { cellWidth: 80 },
+                                1: { cellWidth: 60, halign: 'right' },
+                                2: { cellWidth: 40 }
+                            }
+                        });
+                        
+                        yPosition = doc.lastAutoTable.finalY + 10;
+                        
+                        // Seção 6: Composição de Custos por m²
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('6. COMPOSIÇÃO DE CUSTOS POR m²', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(11);
+                        const costsData = [
+                            ['Item', 'Valor por m²'],
+                            ['Tijolos', formatCurrency(data.brickCostPerM2)],
+                            ['Cimento', formatCurrency(data.cementCostPerM2)],
+                            ['Cal', formatCurrency(data.limeCostPerM2)],
+                            ['Areia', formatCurrency(data.sandCostPerM2)],
+                            ['Mão de obra de assentamento', formatCurrency(data.laborAssembly)],
+                            ['Mão de obra de revestimento', formatCurrency(data.laborRevestimentoPerM2)],
+                            ['TOTAL POR m²', formatCurrency(data.totalCostPerM2)]
+                        ];
+                        
+                        doc.autoTable({
+                            startY: yPosition,
+                            head: [costsData[0]],
+                            body: costsData.slice(1, -1),
+                            theme: 'grid',
+                            headStyles: { fillColor: [44, 82, 130], textColor: [255, 255, 255] },
+                            margin: { left: 15, right: 15 },
+                            tableWidth: pageWidth - 30,
+                            columnStyles: { 
+                                0: { cellWidth: 120 },
+                                1: { cellWidth: 60, halign: 'right' }
+                            }
+                        });
+                        
+                        // Adicionar linha do total
+                        const finalY = doc.lastAutoTable.finalY;
+                        doc.setFontSize(11);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(costsData[costsData.length - 1][0], 25, finalY + 10);
+                        doc.text(costsData[costsData.length - 1][1], pageWidth - 25, finalY + 10, { align: 'right' });
+                        
+                        yPosition = finalY + 20;
+                        
+                        // Seção 7: Custo Total da Parede
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('7. CUSTO TOTAL DA PAREDE', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(16);
+                        doc.setFont(undefined, 'bold');
+                        doc.text(`Área da parede: ${formatNumber(data.wallArea, 2)} m²`, pageWidth / 2, yPosition, { align: 'center' });
+                        yPosition += 10;
+                        doc.text(`Custo total: ${formatCurrency(data.totalWallCost)}`, pageWidth / 2, yPosition, { align: 'center' });
+                        yPosition += 20;
+                        
+                        // Seção 8: Conformidade com Normas
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('8. CONFORMIDADE COM NORMAS ABNT', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        
+                        // Adicionar itens de conformidade
+                        data.normCompliance.compliance.forEach((item, index) => {
+                            doc.setTextColor(40, 167, 69); // Verde
+                            doc.text(item, 15, yPosition + (index * 5));
+                        });
+                        
+                        let warningStart = data.normCompliance.compliance.length;
+                        data.normCompliance.warnings.forEach((item, index) => {
+                            doc.setTextColor(220, 53, 69); // Vermelho
+                            doc.text(item, 15, yPosition + ((warningStart + index) * 5));
+                        });
+                        
+                        yPosition += (data.normCompliance.compliance.length + data.normCompliance.warnings.length) * 5 + 10;
+                        
+                        // Seção 9: Informações Técnicas
+                        doc.setFontSize(14);
+                        doc.setFillColor(240, 240, 240);
+                        doc.rect(10, yPosition - 5, pageWidth - 20, 10, 'F');
+                        doc.text('9. INFORMAÇÕES TÉCNICAS DAS NORMAS', 15, yPosition);
+                        yPosition += 15;
+                        
+                        doc.setFontSize(10);
+                        doc.setFont(undefined, 'normal');
+                        doc.setTextColor(0, 0, 0); // Preto
+                        const techInfo = [
+                            '• NBR 7200:2015 - Espessura máxima sem armadura: 25 mm / com armadura: 40 mm',
+                            '• NBR 7200:2015 - Chapisco obrigatório para aderência do revestimento',
+                            '• NBR 15270-1:2017 - Junta de assentamento: 1.0 a 1.5 cm',
+                            '• NBR 13529:2013 - Requisitos para argamassas industrializadas',
+                            '• Sequência de execução: Chapisco → Emboço → Reboco (NBR 7200)',
+                            '• Intervalo mínimo entre camadas: 24 horas para secagem',
+                            '• Reboco externo deve conter cimento para resistência às intempéries',
+                            '• Valores são estimativas - consulte sempre as normas mais recentes'
+                        ];
+                        
+                        techInfo.forEach((line, index) => {
+                            doc.text(line, 15, yPosition + (index * 5));
+                        });
+                        
+                        yPosition += techInfo.length * 5 + 10;
+                        
+                        // Rodapé
+                        const footerY = 280;
+                        doc.setDrawColor(200, 200, 200);
+                        doc.line(10, footerY, pageWidth - 10, footerY);
+                        
+                        doc.setFontSize(9);
+                        doc.text('Este relatório foi gerado automaticamente pela Calculadora Profissional de Custo de Alvenaria.', pageWidth / 2, footerY + 5, { align: 'center' });
+                        doc.text('Para cálculos mais precisos, consulte um profissional qualificado e as normas técnicas atualizadas.', pageWidth / 2, footerY + 10, { align: 'center' });
+                        
+                        // Nome do arquivo
+                        const fileName = `relatorio_alvenaria_nbr_${data.calculationDate.replace(/\//g, '-')}.pdf`;
+                        
+                        // Salva o PDF
+                        doc.save(fileName);
+                        
+                        // Esconde o loading
+                        loadingOverlay.style.display = 'none';
+                        
+                    } catch (error) {
+                        console.error('Erro ao gerar PDF:', error);
+                        alert('Erro ao gerar o PDF. Por favor, tente novamente.');
+                        loadingOverlay.style.display = 'none';
+                    }
+                }, 500);
+            }
+            
+            // Adicionar eventos a todos os inputs
+            const allInputs = [
+                wallLengthInput, wallHeightInput,
+                brickWidthInput, brickHeightInput, brickLengthInput,
+                jointThicknessInput, brickPriceInput, cementPriceInput,
+                limePriceInput, sandPriceInput, laborAssemblyInput, laborChapiscoInput,
+                laborEmbocoInput, laborRebocoInput, wastePercentageInput,
+                revestimentoThicknessInput
+            ];
+            
+            allInputs.forEach(input => {
+                input.addEventListener('input', calculateCosts);
+            });
+            
+            twoSidesCheckbox.addEventListener('change', calculateCosts);
+            useArmaduraCheckbox.addEventListener('change', calculateCosts);
+            
+            // Evento do botão de cálculo
+            calculateBtn.addEventListener('click', calculateCosts);
+            
+            // Evento do botão de exportação
+            exportBtn.addEventListener('click', generatePDF);
+            
+            // Calcular custos iniciais ao carregar a página
+            calculateCosts();
+            
+            // Adicionar validação para garantir valores positivos
+            allInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    const min = this.getAttribute('min');
+                    const max = this.getAttribute('max');
+                    
+                    let value = parseFloat(this.value);
+                    
+                    if (isNaN(value)) {
+                        this.value = min || 0;
+                    } else if (min !== null && value < parseFloat(min)) {
+                        this.value = min;
+                    } else if (max !== null && value > parseFloat(max)) {
+                        this.value = max;
+                    }
+                    
+                    calculateCosts();
+                });
+            });
+        });
+    </script>
+</body>
+</html>
